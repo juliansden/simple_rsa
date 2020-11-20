@@ -138,7 +138,57 @@ def find_key_pair(p,q,mod_op):
         return [[p*q,e],[p*q,y]]
 
 def construct_r(name,n,e):
-    
+    r = ""
+    bin_name = ""
+    for c in name:
+        bin_name += bin(ord(c))[2:]
+    for x in range(0,(6*8)-len(bin_name)):
+        r += '0'
+    r += bin_name
+    for x in range(0,(4*8)-len(n)):
+        r += '0'
+    r += n
+    for x in range(0,(4*8)-len(e)):
+        r += '0'
+    r += e
+    print("r = "+str(r))
+    return r
+
+def h(r,e,construct_r):
+    if construct_r:
+        r1 = r[0:8]
+        r2 = r[8:16]
+        r3 = r[16:24]
+        r4 = r[24:32]
+        r5 = r[32:40]
+        r6 = r[48:56]
+        r7 = r[56:64]
+        r8 = r[64:72]
+        r9 = r[72:80]
+        r10 = r[80:88]
+        r11 = r[88:96]
+        r12 = r[96:104]
+        r13 = r[104:112]
+
+        new_bit_string = '{:08b}'.format(int(r1,2)^int(r2,2))
+        new_bit_string = '{:08b}'.format(int(new_bit_string,2)^int(r3,2))
+        new_bit_string = '{:08b}'.format(int(new_bit_string,2)^int(r4,2))
+        new_bit_string = '{:08b}'.format(int(new_bit_string,2)^int(r5,2))
+        new_bit_string = '{:08b}'.format(int(new_bit_string,2)^int(r6,2))
+        new_bit_string = '{:08b}'.format(int(new_bit_string,2)^int(r7,2))
+        new_bit_string = '{:08b}'.format(int(new_bit_string,2)^int(r8,2))
+        new_bit_string = '{:08b}'.format(int(new_bit_string,2)^int(r9,2))
+        new_bit_string = '{:08b}'.format(int(new_bit_string,2)^int(r10,2))
+        new_bit_string = '{:08b}'.format(int(new_bit_string,2)^int(r11,2))
+        new_bit_string = '{:08b}'.format(int(new_bit_string,2)^int(r12,2))
+        new_bit_string = '{:032b}'.format(int(new_bit_string,2)^int(r13,2))
+
+        print("h(r) = "+new_bit_string)
+        return new_bit_string
+    else:
+        s = '{:032b}'.format(int(r,2)^e)
+        print("s = "+s)
+        return s
 
 def main():
     # Part 1
@@ -190,13 +240,40 @@ def main():
     print("")
 
     # Part 2
+    # Create Trent's keys
+    print("******* CREATING TRENT KEYS *******")
+    p1_prime = False
+    p2_prime = False
+    while not p1_prime:
+        trent_p1 = generate_random_prime()
+        is_p1_prime = is_prime(trent_p1)
+        if is_p1_prime[0]:
+            p1_prime = True
+    while not p2_prime:
+        trent_p2 = generate_random_prime()
+        is_p2_prime = is_prime(trent_p2)
+        if is_p2_prime[0]:
+            p2_prime = True
+    mod_op = OperationsModulusN((trent_p1-1)*(trent_p2-1))
+    trent_pubk,trent_privk = find_key_pair(trent_p1,trent_p2,mod_op)
+    print("******* END OF CREATING TRENT KEYS *******")
+    print("")
+
     print("Line 190:")
-    print("p="+str(p1),"q="+str(p2),"n="+str(pubk[0]),"e="+str(pubk[1]),"d="+str(privk[1]))
+    print("p="+str(p1),", q="+str(p2),", n="+str(pubk[0]),", e="+str(pubk[1]),", d="+str(privk[1]))
     print("p="+'{:032b}'.format(p1))
     print("q="+'{:032b}'.format(p2))
     print("n="+'{:032b}'.format(pubk[0]))
     print("e="+'{:032b}'.format(pubk[1]))
     print("d="+'{:032b}'.format(privk[1]))
+    print("")
+    print("Line 213:")
+    h_r = h(construct_r('Alice','{:032b}'.format(pubk[0]),'{:032b}'.format(pubk[1])),0,True)
+    s = h(h_r,trent_pubk[1],False)
+    print("")
+    print("Line 273:")
+    print("h(r) = "+str(int(h_r,2)),", s = "+str(int(s,2)))
+    print("")
 
 if __name__ == '__main__':
     main()
