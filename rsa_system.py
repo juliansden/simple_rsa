@@ -1,11 +1,11 @@
-import random
-import sys
+"""Used for random int generation and random bit generation"""
+import random 
 import math
 
 class OperationsModulusN(object):
     """
     This class handles all the operations modulus some positive integer n.
-    n -> the number that all mod operations will use.
+        n -> the number that all mod operations will use.
     """
     def __init__(self,n):
         super(OperationsModulusN, self).__init__()
@@ -48,17 +48,22 @@ class OperationsModulusN(object):
     def pow(self,a,x):
         return self.mod(self.fast_exp(a,x),self.n)
 
-MAX_INT = 2147483647
-PRIMES = [
+MAX_INT = 2147483647 # used for random int generation
+PRIMES = [  # a couple prime numbers used when computing the key pairs
     2,3,5,7,11,13,17,19,23,
     29,31,37,41,43,47,53,59,
     61,67,71,73,79,83,89,97,
     101,103,107,109,113,127
 ]
 
+"""Helper function for generate_random_bitstring(no_prime)."""
 def generate_random_bit(rand_int):
     return bin(rand_int)[-1]
 
+"""
+Generate random bit string.
+    no_prime -> a boolean value which is used to always compute a random bit string which is guaranteed to not be prime.
+"""
 def generate_random_bitstring(no_prime):
     print("Line 50:")
     bit_string = '1'
@@ -86,6 +91,10 @@ def generate_random_bitstring(no_prime):
     print("")
     return int(leading_zeros,2)
 
+"""
+Check whether n is prime.
+    n -> some positive integer.
+"""
 def is_prime(n):
     print('{:<5s}{:<5s}{:<5s}{:<5s}{:<5s}'.format("|i","|xi","|z","|y","|y"))
     mod_n = OperationsModulusN(n)
@@ -116,6 +125,16 @@ def is_prime(n):
     print("")
     return [True,tested_ints]
 
+"""
+Use the extended euclid algorithm to compute the gcd of a and b
+    a       -> int >= 0
+    b       -> int >= 0
+    mod_op  -> OperationsModulusN object used for operations mod n, declared outside of function
+    i       -> int >=0, used to keep index to compute si,ti
+    qi      -> quotent in computing a//b
+    si      -> int defined in textbook
+    ti      -> int defined in textbook
+"""
 def ext_euclid(a,b,mod_op,i,qi,si,ti):
     if i == 2:
         print('{:<10s}{:<10s}{:<12s}{:<12s}{:<12s}{:<12s}{:<12s}'.format("|"+str(i),"|"+str(a//b),"|"+str(a),"|"+str(b),"|"+str(a-(a//b)*b),"|"+str(1),"|"+str(0)))
@@ -136,6 +155,12 @@ def ext_euclid(a,b,mod_op,i,qi,si,ti):
     y = x1
     return gcd,x,y
 
+"""
+Compute a public, private key pair.
+    p       -> prime int <= 127.
+    q       -> prime int <= 127.
+    mod_op  -> OperationsModulusN object used for operations mod n.
+"""
 def find_key_pair(p,q,mod_op):
     phi_n = (p-1)*(q-1)
     e = PRIMES[0]
@@ -163,6 +188,12 @@ def find_key_pair(p,q,mod_op):
         print("d = "+str(y))
         return [[p*q,e],[p*q,y]]
 
+"""
+Construct r = <Alice,alice pub key>.
+    name    -> String which is 'Alice'.
+    n       -> int which is equal to p*q.
+    e       -> int which is one of the private key values.
+"""
 def construct_r(name,n,e):
     r = ""
     bin_name = ""
@@ -180,6 +211,11 @@ def construct_r(name,n,e):
     print("r = "+str(r))
     return r
 
+"""
+Computes the one way hash.
+    r   -> value to be hashed
+    b   -> number of bytes in r
+"""
 def h(r,b):
     if b == 14:
         r1 = r[0:8]
@@ -220,6 +256,9 @@ def h(r,b):
             byte1 = byte1^int(byte_strings[i],2)
         return byte1
 
+"""
+Run main functionality of the program.
+"""
 def main():
     # Part 1
     p1_prime = False
